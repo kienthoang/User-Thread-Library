@@ -74,7 +74,7 @@ int popZombieQueue() {
 
 struct Threadlist * Threadlisthead;
 
-int addChild(struct Threadlist child){
+int addchild(struct Threadlist child){
 	struct Threadlist* tmp,* lastchild;
 	
 	if(Threadlisthead == NULL){

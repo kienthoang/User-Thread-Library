@@ -74,8 +74,8 @@ int popZombieQueue() {
 
 struct Threadlist * Threadlisthead;
 
-int addChild(struct Threadlist child){
-	struct Threadlist* tmp,* lastChild;
+int addchild(struct Threadlist child){
+	struct Threadlist* tmp,* lastchild;
 	
 	if(Threadlisthead == NULL){
 		Threadlisthead = (struct Threadlist*)malloc(sizeof(struct Threadlist));
@@ -189,7 +189,7 @@ void deletezombies(int id){
 	while(id!=1){
 		node=findnode(id);
 		if(node->exit_status==1&&node->child_count==0){
-			pushtozombiequeue(id);
+			pushToZombieQueue(id);
 			id=node->pid;
 			temp=findnode(id);
 			temp->child_count=temp->child_count-1;
@@ -198,13 +198,13 @@ void deletezombies(int id){
 		}
 	}
 
-	id=popfromzombiequeue();
+	id=popZombieQueue();
 	
 	while(id!=-1){
 		temp=findnode(id);
 		deletechild(id);
 		free(temp);
-		id=popfromzombiequeue();
+		id=popZombieQueue();
 	}
 }
 
