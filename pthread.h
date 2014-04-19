@@ -27,42 +27,39 @@ void deletechild(int id);
 
 struct Threadlist* findnode(int id);
 
-int updatenode(int id,ucontext_t *updatecontext);
+int updateNode(int id,ucontext_t *updatecontext);
 
-int findactive(void);
-void clearactive(void);
-void printll();
+int findActive(void);
 
-struct blockedqueue{
+struct blockedQueue{
 	int id;
-	struct blockedqueue * next;
+	struct blockedQueue * next;
 };
 
 static int thread_count=0;
-struct readyqueue{
-
-    int id;
-    struct readyqueue * next;
+struct readyQueue{
+  int id;
+  struct readyQueue * next;
 };
 
-static struct readyqueue * queuehead;
-static struct blockedqueue * blockedqueuehead;
+static struct readyQueue * queueHead;
+static struct blockedQueue * blockedQueueHead;
 
-struct readyqueue * readyqfrontp;
-struct readyqueue * readyqrearp ;
+struct readyQueue * readyQueueFront;
+struct readyQueue * readyQueueRear ;
 
-struct blockedqueue * blockedqfrontp ;
-struct blockedqueue * blockedqrearp ;
+struct blockedQueue * blockedQueueFront ;
+struct blockedQueue * blockedQueueRear ;
 
-void pushtoreadyqueue(int id);
+void pushToReadyQueue(int id);
 
-int popfromreadyqueue();
+int popReadyQueue();
 
-int pushintoblockedqueue(int id);
+int pushBlockedQueue(int id);
 
-void deletefromblockedqueue(int id);
+void removeFromBlockedQueue(int id);
 
-int findinblockedqueue(int id);
+int findFromBlockedQueue(int id);
 
 pthread_t pthread_create(void(*start_routine)(void*), void *args);
 void pthread_yield(void);

@@ -34,40 +34,40 @@ struct ZombieQueue{
 	struct ZombieQueue * next;
 };
 
-static struct ZombieQueue * zomebieQueueHead=NULL;
-struct ZombieQueue * zombieqfrontp =NULL;
-struct ZombieQueue * zombieqrearp = NULL;
+static struct ZombieQueue * zombieQueueHead=NULL;
+struct ZombieQueue * zombieQueueFront =NULL;
+struct ZombieQueue * zombieQueueRear = NULL;
 
 void pushToZombieQueue(int id) {
 	struct ZombieQueue * temp;
-	temp=(struct ZombieQueue*)malloc(sizeof(struct ZombieQueue));
-	temp->id=id;
-	temp->next=NULL;
+	temp = (struct ZombieQueue*)malloc(sizeof(struct ZombieQueue));
+	temp -> id = id;
+	temp -> next = NULL;
 
-	if(zombieqfrontp == NULL && zombieqrearp == NULL){
-		zombieqfrontp=temp;
-		zombieqrearp=temp;
+	if(zombieQueueFront == NULL && zombieQueueRear == NULL){
+		zombieQueueFront=temp;
+		zombieQueueRear=temp;
 	} else{
-		zombieqrearp->next=temp;
-		zombieqrearp=temp;
+		zombieQueueRear -> next = temp;
+		zombieQueueRear = temp;
 	}
 }
 
 int popZombieQueue() {
 	int temp;
 	
-	if(zombieqfrontp==NULL && zombieqrearp==NULL){
+	if(zombieQueueFront == NULL && zombieQueueRear == NULL){
 		return -1;
-	} else if(zombieqfrontp==zombieqrearp){
-		temp=zombieqfrontp->id;
-		zombieqfrontp=NULL;
-		zombieqrearp=NULL;
+	} else if(zombieQueueFront == zombieQueueRear){
+		temp=zombieQueueFront -> id;
+		zombieQueueRear = NULL;
+		zombieQueueRear = NULL;
 		
 		return temp;
 		
 	} else {
-		temp=zombieqfrontp->id;
-		zombieqfrontp=zombieqfrontp->next;
+		temp=zombieQueueFront -> id;
+		zombieQueueFront = zombieQueueFront->next;
 		return temp;
 	}
 }
@@ -127,41 +127,27 @@ int addchild(struct Threadlist child){
 	return 0;
 }
 
-void setchildjoins(int id) {
-	struct Threadlist *temp=Threadlisthead;
-
-	if(temp!=NULL){
-		while(temp!=NULL){
-			if(temp->pid==id){
-				temp->join=1;
-			}
-			
-			temp=temp->next;
-		}
-	}
-}
-
-void deletechild(int id){
-	struct Threadlist *deletenode = Threadlisthead;
+void deleteChild(int id){
+	struct Threadlist *deleteNode = Threadlisthead;
 	
 	struct Threadlist *delete;
-	struct Threadlist *prevnode = NULL;
+	struct Threadlist *prevNode = NULL;
 	
-	if(deletenode!=NULL){
-		if(deletenode->id==id){
-			delete=Threadlisthead;
-			Threadlisthead= Threadlisthead->next;
+	if(deleteNode!=NULL){
+		if(deleteNode->id==id){
+			delete = Threadlisthead;
+			Threadlisthead = Threadlisthead->next;
 			free(delete);
 		} else {
-			prevnode=deletenode;
+			prevNode = deleteNode;
 			
-			while(deletenode!=NULL){
-				if(deletenode->id==id){
-					prevnode->next=deletenode->next;
+			while(deleteNode!=NULL){
+				if(deleteNode -> id == id){
+					prevNode -> next = deleteNode -> next;
 					break;
 				} else {
-					prevnode=deletenode;
-					deletenode=deletenode->next;
+					prevNode = deleteNode;
+					deleteNode = deleteNode->next;
 				}
 			}
 		}
@@ -169,29 +155,29 @@ void deletechild(int id){
 }
 
 
-struct Threadlist * findnode(id){
-	struct Threadlist * homenode = Threadlisthead;
+struct Threadlist * findNode(id){
+	struct Threadlist * node = Threadlisthead;
 
 	do {
-		if(homenode->id==id){
-			return homenode;
+		if (node -> id == id){
+			return node;
 		} else {
-			homenode=homenode->next;
+			node = node -> next;
 		}
-	} while(homenode!=NULL);
+	} while(node != NULL);
 
 	return NULL;
 }
 
-void deletezombies(int id){
+void deleteZombies(int id){
 	struct Threadlist * node, *temp ;
 
 	while(id!=1){
-		node=findnode(id);
+		node=findNode(id);
 		if(node->exit_status==1&&node->child_count==0){
 			pushToZombieQueue(id);
 			id=node->pid;
-			temp=findnode(id);
+			temp=findNode(id);
 			temp->child_count=temp->child_count-1;
 		} else {
 			break;
@@ -201,8 +187,8 @@ void deletezombies(int id){
 	id=popZombieQueue();
 	
 	while(id!=-1){
-		temp=findnode(id);
-		deletechild(id);
+		temp=findNode(id);
+		deleteChild(id);
 		free(temp);
 		id=popZombieQueue();
 	}
@@ -223,148 +209,116 @@ int updatenode(int id,ucontext_t updatecontext) {
 	return -1;
 }
 
-int findactive(void) {
+int findActive(void) {
 	printf("HAHAHA\n");
-	struct Threadlist * homenode = Threadlisthead;
+	struct Threadlist * node = Threadlisthead;
 	int id;
 	printf("HAHAHA\n");
-	while(homenode!=NULL){
+	while(node != NULL){
 		printf("HAHAHA0\n");
-		id=homenode->id;
-		printf("HAHAHA1\n");
 
-		if(homenode->active==1) {
+		if (node->active == 1) {
 			printf("HAHAHA\n");
-			return id;
+			return node -> id;
 		} else {
-			homenode=homenode->next;
+			node = node -> next;
 			printf("HAHAHA123\n");
 		}
 	}
 
 	return -1;
 }
-void clearactive(void){
-	struct Threadlist * homenode = Threadlisthead;
-	
-	do {
-		if(homenode->active==1) {
-			homenode->active=0;
-			return;
-		} else {
-			homenode=homenode->next;
-		}
-	} while(homenode!=NULL);
 
-	return;
-}
-
-void printll(){
-	struct Threadlist * tmp=Threadlisthead;
-	
-	if(tmp!=NULL) {
-		printf("%d---",tmp->id);
-		
-		while(tmp->next!=NULL){
-			tmp=tmp->next;
-			printf(" %d ->",tmp->id);
-		}
-	}
-	else {
-		printf("tlist empty");
-	}
-}
-
-struct blockedqueue{
+struct blockedQueue {
 	int id;
-	struct blockedqueue * next;
+	struct blockedQueue * next;
 };
 
 static int thread_count=0;
 
-struct readyqueue{
+struct readyQueue {
 
     int id;
-    struct readyqueue * next;
+    struct readyQueue * next;
 };
 
-static struct readyqueue * queuehead=NULL ;
+static struct readyQueue * queueHead=NULL ;
 
-static struct blockedqueue * blockedqueuehead=NULL ;
+static struct blockedQueue * blockedQueueHead = NULL ;
 
-struct readyqueue * readyqfrontp =NULL ;
-struct readyqueue * readyqrearp = NULL ;
+struct readyQueue * readyQueueFront =NULL ;
+struct readyQueue * readyQueueRear = NULL ;
 
-struct blockedqueue * blockedqfrontp =NULL ;
-struct blockedqueue * blockedqrearp = NULL ;
+struct blockedQueue * blockedqfrontp =NULL ;
+struct blockedQueue * blockedqrearp = NULL ;
 
-void pushtoreadyqueue(int id){
-	struct readyqueue * temp;
-	temp=(struct readyqueue*)malloc(sizeof(struct readyqueue));
-	temp->id=id;
-	temp->next=NULL;
+void pushToReadyQueue(int id){
+	struct readyQueue * temp;
+	temp = (struct readyQueue*)malloc(sizeof(struct readyQueue));
+	temp -> id = id;
+	temp -> next = NULL;
 
-	if(readyqfrontp ==NULL && readyqrearp ==NULL){
-		readyqfrontp=temp;
-		readyqrearp=temp;
+	if(readyQueueFront == NULL && readyQueueRear == NULL){
+		readyQueueFront = temp;
+		readyQueueRear = temp;
 	}
 	else{
-		readyqrearp->next=temp;
-		readyqrearp=temp;
+		readyQueueRear -> next = temp;
+		readyQueueRear = temp;
 	}
 }
 
-int popfromreadyqueue(){
+int popReadyQueue(){
 	int temp;
 	
-	if(readyqfrontp==NULL && readyqrearp==NULL) {
+	if(readyQueueFront==NULL && readyQueueRear==NULL) {
 		return -1;
-	} else if(readyqfrontp==readyqrearp) {
-		temp=readyqfrontp->id;
-		readyqfrontp=NULL;
-		readyqrearp=NULL;
+	} else if(readyQueueFront == readyQueueRear) {
+		temp=readyQueueFront -> id;
+		readyQueueFront = NULL;
+		readyQueueRear = NULL;
 		return temp;
 	} else {
-		temp=readyqfrontp->id;
-		readyqfrontp=readyqfrontp->next;
+		temp=readyQueueFront->id;
+		readyQueueFront=readyQueueFront->next;
 		return temp;
 	}
 
 }
 
-int pushintoblockedqueue(int id){
+int pushBlockedQueue(int id){
 
-	struct blockedqueue * tmp;
-	struct blockedqueue * nextelement;
+	struct blockedQueue * tmp;
+	struct blockedQueue * nextElement;
 
-	if(blockedqueuehead==NULL){
-		blockedqueuehead=(struct blockedqueue *)malloc(sizeof(struct blockedqueue));
-		blockedqueuehead->id=id;
-		blockedqueuehead->next=NULL;
+	if(blockedQueueHead==NULL){
+		blockedQueueHead=(struct blockedQueue *)malloc(sizeof(struct blockedQueue));
+		blockedQueueHead->id=id;
+		blockedQueueHead->next=NULL;
 		return 1;
 	}
 
 	else {
-		tmp=blockedqueuehead;
-		nextelement=(struct blockedqueue *)malloc(sizeof(struct blockedqueue));
-		nextelement->id=id;
-		nextelement->next=NULL;
+		tmp=blockedQueueHead;
+		nextElement=(struct blockedQueue *)malloc(sizeof(struct blockedQueue));
+		nextElement->id=id;
+		nextElement->next=NULL;
 		while(tmp->next!=NULL){
 			tmp=tmp->next;
 		}
-		tmp->next=nextelement;
+		tmp->next=nextElement;
 		return 1;
 	}
 	
 	return -1;
 }
 
-void deletefromblockedqueue(int id){
-	struct blockedqueue * tmp=blockedqueuehead;
+void removeFromBlockedQueue(int id){
+	struct blockedQueue * tmp=blockedQueueHead;
 	
 	if(tmp!=NULL){
 		if(tmp->id==id){
-			blockedqueuehead=blockedqueuehead->next;
+			blockedQueueHead=blockedQueueHead->next;
 		} else {
 			while(tmp->next!=NULL) {
 				if(tmp->next->id==id) {
@@ -378,8 +332,8 @@ void deletefromblockedqueue(int id){
 	}
 }
 
-int findinblockedqueue(int id){
-struct blockedqueue * tmp=blockedqueuehead;
+int findFromBlockedQueue(int id){
+struct blockedQueue * tmp=blockedQueueHead;
 
 	if(tmp==NULL){
 		return -1;
@@ -399,24 +353,24 @@ struct blockedqueue * tmp=blockedqueuehead;
 
 pthread_t pthread_create(void(*start_routine)(void*), void *args) {
 	printf("YAYAYAYAYAYYAYA\n");
-	struct Threadlist * parent,* returnid;
+	struct Threadlist * parent,* returnId;
 	struct Threadlist child;
 	printf("YAYAYAYAYAYYAYA\n");
-	ucontext_t childcontext;
+	ucontext_t childContext;
 	int result;
 	printf("YAYAYAYAYAYYAYA\n");
-	parent=findnode(findactive());
+	parent=findNode(findActive());
 	printf("YAYAYAYAYAYYAYA\n");
-	getcontext(&childcontext);
-	childcontext.uc_link=0;
-	childcontext.uc_stack.ss_sp = malloc (8*1064);
-	if(childcontext.uc_stack.ss_sp==NULL){
+	getcontext(&childContext);
+	childContext.uc_link=0;
+	childContext.uc_stack.ss_sp = malloc (8*1064);
+	if(childContext.uc_stack.ss_sp==NULL){
 		exit(0);
 	}
 printf("HIHIHIHI\n");
-	childcontext.uc_stack.ss_size = 8*1064;
-	childcontext.uc_stack.ss_flags = 0;
-	makecontext(&childcontext, (void(*)(void))start_routine, 1, args);
+	childContext.uc_stack.ss_size = 8*1064;
+	childContext.uc_stack.ss_flags = 0;
+	makecontext(&childContext, (void(*)(void))start_routine, 1, args);
 
 	child.id=++thread_count;
 	child.child_count=0;
@@ -424,39 +378,39 @@ printf("HIHIHIHI\n");
 	child.join=0;
 	child.join_count=0;
 	child.wait_status=0;
-	child.context=childcontext;
+	child.context=childContext;
 	child.pid=parent->id;
 
 	result=addchild(child);
 	if(result!=-1){
-		pushtoreadyqueue(child.id);
+		pushToReadyQueue(child.id);
 	}
 		    
-	returnid=findnode(child.id);
-	return (void *)&returnid->id;
+	returnId=findNode(child.id);
+	return (void *)&returnId->id;
 }
 
 void pthread_yield(void) {
 	int id;
-	ucontext_t savecontext,newcontext;
+	ucontext_t saveContext,newContext;
 	struct Threadlist * current_thread;
 	struct Threadlist * next_thread;
 
-	id=findactive();
-	current_thread=findnode(id);
+	id=findActive();
+	current_thread=findNode(id);
 
-	pushtoreadyqueue(id);
+	pushToReadyQueue(id);
 
-	id=popfromreadyqueue();
+	id=popReadyQueue();
 	if(id!=-1){
-		next_thread=findnode(id);
+		next_thread=findNode(id);
 
 		current_thread->active=0;
 		next_thread->active=1;
 
-		getcontext(&savecontext);
-		current_thread->context=savecontext;
-		newcontext=next_thread->context;
+		getcontext(&saveContext);
+		current_thread->context=saveContext;
+		newContext=next_thread->context;
 
 		swapcontext(&current_thread->context,&next_thread->context);
 	}
@@ -469,8 +423,8 @@ void pthread_yield(void) {
 	int next_id;
 
 	struct Threadlist * child,*active,*next_active;
-	child = findnode(thread);
-	active = findnode(findactive());
+	child = findNode(thread);
+	active = findNode(findActive());
 	
 	if(child==NULL){
 		return -1;
@@ -481,11 +435,11 @@ void pthread_yield(void) {
 
 		active->join_count=active->join_count+1;
 		child->join=1;
-		pushintoblockedqueue(active->id);
+		pushBlockedQueue(active->id);
 		active->active=0;
-		next_id=popfromreadyqueue();
+		next_id=popReadyQueue();
 
-		next_active=findnode(next_id);
+		next_active=findNode(next_id);
 		next_active->active=1;
 		swapcontext(&active->context,&next_active->context);
 	
@@ -498,18 +452,18 @@ void pthread_yield(void) {
 }
 
 void pthread_exit(void) {
-	int id,parent_id,child_id,deleteid,grandparent;
+	int id,parent_id,child_id,deleteId,grandParent;
 	struct Threadlist * parent, *child,*zombies;
 	ucontext_t *temp;
 	ucontext_t parentcontext,tempcontext;
-	struct readyqueue *temp1=readyqfrontp;
+	struct readyQueue *temp1=readyQueueFront;
 
-	child=findnode(findactive());
-	temp1=readyqfrontp;
+	child=findNode(findActive());
+	temp1=readyQueueFront;
 
 	parent_id=child->pid;
 	child_id=child->id;
-	parent=findnode(parent_id);
+	parent=findNode(parent_id);
 
 
 	child->active=0;
@@ -524,7 +478,7 @@ void pthread_exit(void) {
 		}
 		
 		if(parent->wait_status==0&&parent->exit_status==0) {
-			pushtoreadyqueue(parent->id);
+			pushToReadyQueue(parent->id);
 		}
 	}
 		
@@ -536,13 +490,13 @@ void pthread_exit(void) {
 		parent->child_count=(parent->child_count)-1;
 		
 		if(parent->child_count==0&&parent->exit_status==1) {
-			deletezombies(parent->id);
+			deleteZombies(parent->id);
 		} else {
-			deletechild(child->id);
+			deleteChild(child->id);
 		}
 	}
 
-	id=popfromreadyqueue();
+	id=popReadyQueue();
 	if(id==-1){
 		parent=Threadlisthead;
 		parent->active=1;
@@ -551,7 +505,7 @@ void pthread_exit(void) {
 	}
 	
 	if(id!=-1) {
-		parent=findnode(id);
+		parent=findNode(id);
 		parent->active=1;
 		swapcontext(&tempcontext,&parent->context);
 	}
