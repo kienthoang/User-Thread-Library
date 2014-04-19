@@ -1,0 +1,70 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "pthread_test.h"
+
+#ifndef PTHREAD
+#include "pthread.h"
+#endif
+
+static void hello(char *msg) {
+  pthread_t thread;
+
+  printf("Made it to hello() in called thread\n");
+  printf("Message: %s\n", msg);
+  pthread_yield();
+  printf("Thread returns from first yield\n");
+
+  pthread_yield();
+  printf("Thread returns from second yield\n");
+
+  while(1) {
+    pthread_yield();
+  }
+  
+}
+
+int main(int argc, char **argv) {
+  pthread_test();
+
+  printf("\n\n*** BUG **** Should not get here\n\n");
+  return 0;
+}
+
+
+void pthread_test()
+{
+  pthread_t thread;
+
+  printf("Starting tests...\n");
+
+  thread = pthread_create((void (*)(void *))hello, "World");
+
+  /*
+   * Create 10 threads
+   */
+  int i;
+  static const int NUM_THREAD = 10;
+  pthread_t children[NUM_THREAD];
+  char msg[NUM_THREAD][1024];
+  
+  for(i = 0; i < NUM_THREAD; i++){
+    thread = snprintf(msg[i], 1023, "Hello from thread %d\n", i);
+    children[i] = pthread_create((void (*)(void *))hello, msg[i]);
+  }
+  
+  for(i = 0; i < NUM_THREAD; i++){
+    pthread_yield();
+  }
+
+
+  /*
+   * Destroy 11 threads we just created
+   */
+  pthread_exit();
+
+  for(i = 0; i < NUM_THREAD; i++){
+    pthread_exit();
+  }
+}
+

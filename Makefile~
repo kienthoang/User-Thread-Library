@@ -1,0 +1,6 @@
+test:
+	gcc -m32 -o pthread_test pthread.c pthread_test.c
+	
+clean:
+	rm pthread_test
+
