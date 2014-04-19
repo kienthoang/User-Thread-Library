@@ -72,7 +72,7 @@ int popZombieQueue() {
 	}
 }
 
-struct Threadlist * Threadlisthead;
+struct Threadlist * Threadlisthead = NULL;
 
 int addchild(struct Threadlist child){
 	struct Threadlist* tmp,* lastchild;
@@ -225,7 +225,8 @@ int updatenode(int id,ucontext_t updatecontext) {
 
 int findactive(void) {
 	printf("HAHAHA\n");
-	struct Threadlist * homenode = Threadlisthead;
+	struct Threadlist* homenode = NULL;
+	homenode = Threadlisthead;
 	int id;
 	printf("HAHAHA\n");
 	while(homenode!=NULL){
