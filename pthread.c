@@ -72,7 +72,7 @@ int popZombieQueue() {
 	}
 }
 
-struct Threadlist * Threadlisthead;
+struct Threadlist * Threadlisthead = NULL;
 
 int addchild(struct Threadlist child){
 	struct Threadlist* tmp,* lastchild;
@@ -367,7 +367,7 @@ pthread_t pthread_create(void(*start_routine)(void*), void *args) {
 	if(childContext.uc_stack.ss_sp==NULL){
 		exit(0);
 	}
-printf("HIHIHIHI\n");
+	printf("HIHIHIHI\n");
 	childContext.uc_stack.ss_size = 8*1064;
 	childContext.uc_stack.ss_flags = 0;
 	makecontext(&childContext, (void(*)(void))start_routine, 1, args);

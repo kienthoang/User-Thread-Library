@@ -72,7 +72,7 @@ int popZombieQueue() {
 	}
 }
 
-struct Threadlist * Threadlisthead;
+struct Threadlist * Threadlisthead = NULL;
 
 int addchild(struct Threadlist child){
 	struct Threadlist* tmp,* lastchild;
@@ -211,7 +211,12 @@ int updatenode(int id,ucontext_t updatecontext) {
 
 int findActive(void) {
 	printf("HAHAHA\n");
+<<<<<<< HEAD
 	struct Threadlist * node = Threadlisthead;
+=======
+	struct Threadlist* homenode = NULL;
+	homenode = Threadlisthead;
+>>>>>>> c743873ab3f9783d8dc20cb2b451cb13ff1a3c80
 	int id;
 	printf("HAHAHA\n");
 	while(node != NULL){
@@ -412,7 +417,7 @@ void pthread_yield(void) {
 		current_thread->context=saveContext;
 		newContext=next_thread->context;
 
-		swapContext(&current_thread->context,&next_thread->context);
+		swapcontext(&current_thread->context,&next_thread->context);
 	}
 	return;
 }
@@ -441,7 +446,7 @@ void pthread_yield(void) {
 
 		next_active=findNode(next_id);
 		next_active->active=1;
-		swapContext(&active->context,&next_active->context);
+		swapcontext(&active->context,&next_active->context);
 	
 		return 1;
 	} else if(child->pid!=active->id) {
@@ -501,13 +506,13 @@ void pthread_exit(void) {
 		parent=Threadlisthead;
 		parent->active=1;
 		free(child);
-		swapContext(&child->context,&parent->context);
+		swapcontext(&child->context,&parent->context);
 	}
 	
 	if(id!=-1) {
 		parent=findNode(id);
 		parent->active=1;
-		swapContext(&tempcontext,&parent->context);
+		swapcontext(&tempcontext,&parent->context);
 	}
 }
 
